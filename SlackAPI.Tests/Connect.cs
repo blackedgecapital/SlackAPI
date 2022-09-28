@@ -19,10 +19,10 @@ namespace SlackAPI.Tests
 
         public Connect(IntegrationFixture fixture)
         {
-            //this.fixture = fixture;
+            this.fixture = fixture;
 
-            //// Extra wait to mitigate Slack throttling
-            //Thread.Sleep(2000);
+            // Extra wait to mitigate Slack throttling
+            Thread.Sleep(2000);
         }
 
         public void Dispose()
