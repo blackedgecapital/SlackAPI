@@ -63,46 +63,13 @@ namespace SlackAPI
         protected virtual void Connected(LoginResponse loginDetails)
         {
             MySelf = loginDetails.self;
-            MyData = loginDetails.users.First((c) => c.id == MySelf.id);
             MyTeam = loginDetails.team;
 
-            Users = new List<User>(loginDetails.users.Where((c) => !c.deleted));
-            Bots = new List<Bot>(loginDetails.bots.Where((c) => !c.deleted));
-            Channels = new List<Channel>(loginDetails.channels);
-            Groups = new List<Channel>(loginDetails.groups);
-            DirectMessages = new List<DirectMessageConversation>(loginDetails.ims.Where((c) => Users.Exists((a) => a.id == c.user) && c.id != MySelf.id));
-            starredChannels =
-                    Groups.Where((c) => c.is_starred).Select((c) => c.id)
-                .Union(
-                    DirectMessages.Where((c) => c.is_starred).Select((c) => c.user)
-                ).Union(
-                    Channels.Where((c) => c.is_starred).Select((c) => c.id)
-                ).ToList();
-
             UserLookup = new Dictionary<string, User>();
-            foreach (User u in Users) UserLookup.Add(u.id, u);
-
             ChannelLookup = new Dictionary<string, Channel>();
             ConversationLookup = new Dictionary<string, Conversation>();
-            foreach (Channel c in Channels)
-            {
-                ChannelLookup.Add(c.id, c);
-                ConversationLookup.Add(c.id, c);
-            }
-
             GroupLookup = new Dictionary<string, Channel>();
-            foreach (Channel g in Groups)
-            {
-                GroupLookup.Add(g.id, g);
-                ConversationLookup.Add(g.id, g);
-            }
-
             DirectMessageLookup = new Dictionary<string, DirectMessageConversation>();
-            foreach (DirectMessageConversation im in DirectMessages)
-            {
-                DirectMessageLookup.Add(im.id, im);
-                ConversationLookup.Add(im.id, im);
-            }
         }
 
         public void APIRequestWithToken<K>(Action<K> callback, params Tuple<string, string>[] getParameters)
@@ -172,7 +139,7 @@ namespace SlackAPI
 
         public void GetChannelList(Action<ChannelListResponse> callback, bool ExcludeArchived = true)
         {
-            APIRequestWithToken(callback, new Tuple<string, string>("exclude_archived", ExcludeArchived ? "1" : "0"));
+            APIRequestWithToken(callback, new Tuple<string, string>("exclude_archived", ExcludeArchived ? "1" : "0"), new Tuple<string, string>("limit", "1000"));
         }
 
         public void GetGroupsList(Action<GroupListResponse> callback, bool ExcludeArchived = true)

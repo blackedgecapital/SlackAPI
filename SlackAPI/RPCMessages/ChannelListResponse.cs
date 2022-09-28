@@ -2,7 +2,7 @@
 
 namespace SlackAPI
 {
-    [RequestPath("channels.list")]
+    [RequestPath("conversations.list")]
     public class ChannelListResponse : Response
     {
         public Channel[] channels;

@@ -19,10 +19,10 @@ namespace SlackAPI.Tests
 
         public Connect(IntegrationFixture fixture)
         {
-            this.fixture = fixture;
+            //this.fixture = fixture;
 
-            // Extra wait to mitigate Slack throttling
-            Thread.Sleep(2000);
+            //// Extra wait to mitigate Slack throttling
+            //Thread.Sleep(2000);
         }
 
         public void Dispose()
@@ -40,7 +40,8 @@ namespace SlackAPI.Tests
         [Fact]
         public void TestConnectAsBot()
         {
-            slackClient = this.fixture.CreateBotClient();
+            slackClient = new SlackSocketClient("xoxb-15587958630-551525529541-mtBRI8KTYxYkiFyA3rWAWP3C");
+            slackClient.Connect((response) => { Console.WriteLine(response.ok); });
             Assert.True(slackClient.IsConnected, "Invalid, doesn't think it's connected.");
         }
 

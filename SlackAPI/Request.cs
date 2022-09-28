@@ -10,8 +10,6 @@ using System.Threading;
 
 namespace SlackAPI
 {
-    
-
     class RequestState<K>
         where K : Response
     {

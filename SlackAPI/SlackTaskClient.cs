@@ -54,32 +54,16 @@ namespace SlackAPI
         protected virtual void Connected(LoginResponse loginDetails)
         {
             MySelf = loginDetails.self;
-            MyData = loginDetails.users.First((c) => c.id == MySelf.id);
             MyTeam = loginDetails.team;
 
-            Users = new List<User>(loginDetails.users.Where((c) => !c.deleted));
-            Channels = new List<Channel>(loginDetails.channels);
-            Groups = new List<Channel>(loginDetails.groups);
-            DirectMessages = new List<DirectMessageConversation>(loginDetails.ims.Where((c) => Users.Exists((a) => a.id == c.user) && c.id != MySelf.id));
-            starredChannels =
-                    Groups.Where((c) => c.is_starred).Select((c) => c.id)
-                .Union(
-                    DirectMessages.Where((c) => c.is_starred).Select((c) => c.user)
-                ).Union(
-                    Channels.Where((c) => c.is_starred).Select((c) => c.id)
-                ).ToList();
+            Users = new List<User>();
+            Channels = new List<Channel>();
+            Groups = new List<Channel>();
 
             UserLookup = new Dictionary<string, User>();
-            foreach (User u in Users) UserLookup.Add(u.id, u);
-
             ChannelLookup = new Dictionary<string, Channel>();
-            foreach (Channel c in Channels) ChannelLookup.Add(c.id, c);
-
             GroupLookup = new Dictionary<string, Channel>();
-            foreach (Channel g in Groups) GroupLookup.Add(g.id, g);
-
             DirectMessageLookup = new Dictionary<string, DirectMessageConversation>();
-            foreach (DirectMessageConversation im in DirectMessages) DirectMessageLookup.Add(im.id, im);
         }
 
         public Task<K> APIRequestWithTokenAsync<K>()

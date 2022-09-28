@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace SlackAPI
 {
-	[RequestPath("rtm.start")]
+	[RequestPath("rtm.connect")]
 	public class LoginResponse : Response
 	{
-		public Bot[] bots;
-		public Channel[] channels;
-		public Channel[] groups;
-		public DirectMessageConversation[] ims;
+		//public Bot[] bots;
+		//public Channel[] channels;
+		//public Channel[] groups;
+		//public DirectMessageConversation[] ims;
 		public Self self;
-		public int svn_rev;
-		public int min_svn_rev;
+		//public int svn_rev;
+		//public int min_svn_rev;
 		public Team team;
 		public string url;
-		public User[] users;
+		//public User[] users;
 	}
 
     public class Self

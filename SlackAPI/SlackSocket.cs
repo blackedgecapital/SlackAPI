@@ -92,7 +92,7 @@ namespace SlackAPI
             currentId = 1;
 
             cts = new CancellationTokenSource();
-            socket.ConnectAsync(new Uri(string.Format("{0}?svn_rev={1}&login_with_boot_data-0-{2}&on_login-0-{2}&connect-1-{2}", loginDetails.url, loginDetails.svn_rev, DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds)), cts.Token).Wait();
+            socket.ConnectAsync(new Uri(string.Format("{0}?&login_with_boot_data-0-{1}&on_login-0-{1}&connect-1-{1}", loginDetails.url, DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds)), cts.Token).Wait();
             if(onConnected != null)
                 onConnected();
             SetupReceiving();
