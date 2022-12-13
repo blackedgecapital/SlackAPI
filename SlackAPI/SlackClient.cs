@@ -648,12 +648,13 @@ namespace SlackAPI
             bool? as_user = null,
 	          string thread_ts = null)
         {
-            List<Tuple<string,string>> parameters = new List<Tuple<string,string>>();
+            List<Tuple<string, string>> parameters = new List<Tuple<string, string>>
+            {
+                new Tuple<string, string>("channel", channelId),
+                new Tuple<string, string>("text", text)
+            };
 
-            parameters.Add(new Tuple<string,string>("channel", channelId));
-            parameters.Add(new Tuple<string,string>("text", text));
-
-            if(!string.IsNullOrEmpty(botName))
+            if (!string.IsNullOrEmpty(botName))
                 parameters.Add(new Tuple<string,string>("username", botName));
 
             if (!string.IsNullOrEmpty(parse))
@@ -846,7 +847,8 @@ namespace SlackAPI
             APIRequestWithToken(callback, parameters.ToArray());
         }
 
-        public void UploadFile(Action<FileUploadResponse> callback, byte[] fileData, string fileName, string[] channelIds, string title = null, string initialComment = null, bool useAsync = false, string fileType = null)
+        public void UploadFile(Action<FileUploadResponse> callback, byte[] fileData, string fileName, string[] channelIds, string title = null, string initialComment = null, 
+            bool useAsync = false, string fileType = null, string thread_ts = null)
         {
             Uri target = new Uri(Path.Combine(APIBaseLocation, useAsync ? "files.uploadAsync" : "files.upload"));
 
@@ -864,6 +866,9 @@ namespace SlackAPI
 
             if (!string.IsNullOrEmpty(initialComment))
                 parameters.Add(string.Format("{0}={1}", "initial_comment", initialComment));
+
+            if (!string.IsNullOrEmpty(thread_ts))
+                parameters.Add(string.Format("{0}={1}", "thread_ts", thread_ts));
 
             parameters.Add(string.Format("{0}={1}", "channels", string.Join(",", channelIds)));
 
