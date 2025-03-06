@@ -231,3 +231,7 @@ tools/*
 
 .vs/
 artifacts/
+.env
+.direnv
+result*
+tmp

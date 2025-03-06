@@ -1,13 +1,12 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using SlackAPI.RPCMessages;
-
+using System.IO;
 namespace SlackAPI
 {
     /// <summary>
@@ -48,7 +47,7 @@ namespace SlackAPI
             APIToken = token;
         }
 
-		public virtual void Connect(Action<LoginResponse> onConnected = null, Action onSocketConnected = null)
+        public virtual void Connect(Action<LoginResponse> onConnected = null, Action onSocketConnected = null)
         {
             EmitLogin((loginDetails) =>
             {
@@ -75,7 +74,7 @@ namespace SlackAPI
         public void APIRequestWithToken<K>(Action<K> callback, params Tuple<string, string>[] getParameters)
             where K : Response
         {
-            APIRequest(callback, getParameters, new Tuple<string, string>[0], APIToken);
+            APIRequest(callback, getParameters, [], APIToken);
         }
 
         public void TestAuth(Action<AuthTestResponse> callback)
@@ -93,9 +92,10 @@ namespace SlackAPI
             APIRequestWithToken(callback, new Tuple<string, string>("email", email));
         }
 
-        public void ChannelsCreate(Action<ChannelCreateResponse> callback, string name) {
-			APIRequestWithToken(callback, new Tuple<string, string>("name", name));
-		}
+        public void ChannelsCreate(Action<ChannelCreateResponse> callback, string name)
+        {
+            APIRequestWithToken(callback, new Tuple<string, string>("name", name));
+        }
 
         public void ChannelsInvite(Action<ChannelInviteResponse> callback, string userId, string channelId)
         {
@@ -104,25 +104,25 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("user", userId));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void GetConversationsList(Action<ConversationsListResponse> callback, string cursor = "", bool ExcludeArchived = true, int limit = 100, string[] types = null)
         {
-	        List<Tuple<string, string>> parameters = new List<Tuple<string, string>>()
-	        {
-		        Tuple.Create("exclude_archived", ExcludeArchived ? "1" : "0")
-	        };
-	        if (limit > 0)
-		        parameters.Add(Tuple.Create("limit", limit.ToString()));
+            List<Tuple<string, string>> parameters = new List<Tuple<string, string>>()
+            {
+                Tuple.Create("exclude_archived", ExcludeArchived ? "1" : "0")
+            };
+            if (limit > 0)
+                parameters.Add(Tuple.Create("limit", limit.ToString()));
             if ((types != null) && types.Any())
-		        parameters.Add(Tuple.Create("types", string.Join(",", types)));
-	        if (!string.IsNullOrEmpty(cursor))
-		        parameters.Add(Tuple.Create("cursor", cursor));
+                parameters.Add(Tuple.Create("types", string.Join(",", types)));
+            if (!string.IsNullOrEmpty(cursor))
+                parameters.Add(Tuple.Create("cursor", cursor));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
-        
+
         public void GetConversationsMembers(Action<ConversationsMembersResponse> callback, string channelId, string cursor = "", int limit = 100)
         {
             List<Tuple<string, string>> parameters = new List<Tuple<string, string>>
@@ -134,7 +134,7 @@ namespace SlackAPI
             if (!string.IsNullOrEmpty(cursor))
                 parameters.Add(Tuple.Create("cursor", cursor));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void GetChannelList(Action<ChannelListResponse> callback, bool ExcludeArchived = true)
@@ -157,7 +157,7 @@ namespace SlackAPI
             List<Tuple<string, string>> parameters = new List<Tuple<string, string>>();
 
             if (!string.IsNullOrEmpty(userId))
-                parameters.Add(new Tuple<string,string>("user", userId));
+                parameters.Add(new Tuple<string, string>("user", userId));
 
             if (from.HasValue)
                 parameters.Add(new Tuple<string, string>("ts_from", from.Value.ToProperTimeStamp()));
@@ -196,25 +196,25 @@ namespace SlackAPI
             if (!string.IsNullOrEmpty(channel))
                 parameters.Add(new Tuple<string, string>("channel", channel));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         void GetHistory<K>(Action<K> historyCallback, string channel, DateTime? latest = null, DateTime? oldest = null, int? count = null, bool? unreads = false)
             where K : MessageHistory
         {
-            List<Tuple<string,string>> parameters = new List<Tuple<string,string>>();
+            List<Tuple<string, string>> parameters = new List<Tuple<string, string>>();
             parameters.Add(new Tuple<string, string>("channel", channel));
 
-            if(latest.HasValue)
+            if (latest.HasValue)
                 parameters.Add(new Tuple<string, string>("latest", latest.Value.ToProperTimeStamp()));
-            if(oldest.HasValue)
+            if (oldest.HasValue)
                 parameters.Add(new Tuple<string, string>("oldest", oldest.Value.ToProperTimeStamp()));
-            if(count.HasValue)
-                parameters.Add(new Tuple<string,string>("count", count.Value.ToString()));
+            if (count.HasValue)
+                parameters.Add(new Tuple<string, string>("count", count.Value.ToString()));
             if (unreads.HasValue)
                 parameters.Add(new Tuple<string, string>("unreads", unreads.Value ? "1" : "0"));
 
-            APIRequestWithToken(historyCallback, parameters.ToArray());
+            APIRequestWithToken(historyCallback, [.. parameters]);
         }
 
         public void GetChannelHistory(Action<ChannelMessageHistory> callback, Channel channelInfo, DateTime? latest = null, DateTime? oldest = null, int? count = null, bool? unreads = false)
@@ -247,17 +247,17 @@ namespace SlackAPI
 
         public void GetFileInfo(Action<FileInfoResponse> callback, string fileId, int? page = null, int? count = null)
         {
-            List<Tuple<string,string>> parameters = new List<Tuple<string,string>>();
+            List<Tuple<string, string>> parameters = new List<Tuple<string, string>>();
 
-            parameters.Add(new Tuple<string,string>("file", fileId));
+            parameters.Add(new Tuple<string, string>("file", fileId));
 
-            if(count.HasValue)
-                parameters.Add(new Tuple<string,string>("count", count.Value.ToString()));
+            if (count.HasValue)
+                parameters.Add(new Tuple<string, string>("count", count.Value.ToString()));
 
             if (page.HasValue)
                 parameters.Add(new Tuple<string, string>("page", page.Value.ToString()));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
         #region Groups
         public void GroupsArchive(Action<GroupArchiveResponse> callback, string channelId)
@@ -287,7 +287,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("user", userId));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void GroupsKick(Action<GroupKickResponse> callback, string userId, string channelId)
@@ -297,7 +297,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("user", userId));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void GroupsLeave(Action<GroupLeaveResponse> callback, string channelId)
@@ -322,7 +322,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("name", name));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void GroupsSetPurpose(Action<GroupSetPurposeResponse> callback, string channelId, string purpose)
@@ -332,7 +332,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("purpose", purpose));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void GroupsSetTopic(Action<GroupSetPurposeResponse> callback, string channelId, string topic)
@@ -342,7 +342,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("topic", topic));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void GroupsUnarchive(Action<GroupUnarchiveResponse> callback, string channelId)
@@ -375,7 +375,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("users", string.Join(",", userIds)));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void ConversationsJoin(Action<ConversationsJoinResponse> callback, string channelId)
@@ -390,7 +390,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("user", userId));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void ConversationsLeave(Action<ConversationsLeaveResponse> callback, string channelId)
@@ -405,7 +405,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("ts", ts.ToProperTimeStamp()));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void ConversationsOpen(Action<ConversationsOpenResponse> callback, string channelId)
@@ -420,7 +420,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("name", name));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void ConversationsSetPurpose(Action<ConversationsSetPurposeResponse> callback, string channelId, string purpose)
@@ -430,7 +430,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("purpose", purpose));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void ConversationsSetTopic(Action<ConversationsSetPurposeResponse> callback, string channelId, string topic)
@@ -440,7 +440,7 @@ namespace SlackAPI
             parameters.Add(new Tuple<string, string>("channel", channelId));
             parameters.Add(new Tuple<string, string>("topic", topic));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void ConversationsUnarchive(Action<ConversationsUnarchiveResponse> callback, string channelId)
@@ -471,7 +471,7 @@ namespace SlackAPI
             if (page.HasValue)
                 parameters.Add(new Tuple<string, string>("page", page.Value.ToString()));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void SearchMessages(Action<SearchResponseMessages> callback, string query, string sorting = null, SearchSortDirection? direction = null, bool enableHighlights = false, int? count = null, int? page = null)
@@ -494,7 +494,7 @@ namespace SlackAPI
             if (page.HasValue)
                 parameters.Add(new Tuple<string, string>("page", page.Value.ToString()));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void SearchFiles(Action<SearchResponseFiles> callback, string query, string sorting = null, SearchSortDirection? direction = null, bool enableHighlights = false, int? count = null, int? page = null)
@@ -517,22 +517,23 @@ namespace SlackAPI
             if (page.HasValue)
                 parameters.Add(new Tuple<string, string>("page", page.Value.ToString()));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
-        public void GetStars(Action<StarListResponse> callback, string userId = null, int? count = null, int? page = null){
-            List<Tuple<string,string>> parameters = new List<Tuple<string,string>>();
+        public void GetStars(Action<StarListResponse> callback, string userId = null, int? count = null, int? page = null)
+        {
+            List<Tuple<string, string>> parameters = new List<Tuple<string, string>>();
 
-            if(!string.IsNullOrEmpty(userId))
-                parameters.Add(new Tuple<string,string>("user", userId));
+            if (!string.IsNullOrEmpty(userId))
+                parameters.Add(new Tuple<string, string>("user", userId));
 
-            if(count.HasValue)
-                parameters.Add(new Tuple<string,string>("count", count.Value.ToString()));
+            if (count.HasValue)
+                parameters.Add(new Tuple<string, string>("count", count.Value.ToString()));
 
-            if(page.HasValue)
-                parameters.Add(new Tuple<string,string>("page", page.Value.ToString()));
+            if (page.HasValue)
+                parameters.Add(new Tuple<string, string>("page", page.Value.ToString()));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void DeleteMessage(Action<DeletedResponse> callback, string channelId, DateTime ts)
@@ -543,7 +544,7 @@ namespace SlackAPI
                 new Tuple<string,string>("channel", channelId)
             };
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void EmitPresence(Action<PresenceResponse> callback, Presence status)
@@ -608,23 +609,23 @@ namespace SlackAPI
                 parameters.Add(new Tuple<string, string>("link_names", "1"));
 
             if (blocks != null && blocks.Length > 0)
-               parameters.Add(new Tuple<string, string>("blocks",
-                  JsonConvert.SerializeObject(blocks, new JsonSerializerSettings()
-                  {
-                     NullValueHandling = NullValueHandling.Ignore
-                  })));
+                parameters.Add(new Tuple<string, string>("blocks",
+                   JsonConvert.SerializeObject(blocks, new JsonSerializerSettings()
+                   {
+                       NullValueHandling = NullValueHandling.Ignore
+                   })));
 
             if (attachments != null && attachments.Length > 0)
                 parameters.Add(new Tuple<string, string>("attachments",
                    JsonConvert.SerializeObject(attachments, new JsonSerializerSettings()
                    {
-                      NullValueHandling = NullValueHandling.Ignore
+                       NullValueHandling = NullValueHandling.Ignore
                    })));
-            
+
             if (as_user.HasValue)
                 parameters.Add(new Tuple<string, string>("as_user", as_user.ToString()));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void JoinDirectMessageChannel(Action<JoinDirectMessageChannelResponse> callback, string user)
@@ -646,7 +647,7 @@ namespace SlackAPI
             string icon_url = null,
             string icon_emoji = null,
             bool? as_user = null,
-	          string thread_ts = null)
+              string thread_ts = null)
         {
             List<Tuple<string, string>> parameters = new List<Tuple<string, string>>
             {
@@ -655,7 +656,7 @@ namespace SlackAPI
             };
 
             if (!string.IsNullOrEmpty(botName))
-                parameters.Add(new Tuple<string,string>("username", botName));
+                parameters.Add(new Tuple<string, string>("username", botName));
 
             if (!string.IsNullOrEmpty(parse))
                 parameters.Add(new Tuple<string, string>("parse", parse));
@@ -664,20 +665,20 @@ namespace SlackAPI
                 parameters.Add(new Tuple<string, string>("link_names", "1"));
 
             if (blocks != null && blocks.Length > 0)
-               parameters.Add(new Tuple<string, string>("blocks",
-                  JsonConvert.SerializeObject(blocks, Formatting.None,
-                     new JsonSerializerSettings // Shouldn't include a not set property
-                     {
-                        NullValueHandling = NullValueHandling.Ignore
-                     })));
+                parameters.Add(new Tuple<string, string>("blocks",
+                   JsonConvert.SerializeObject(blocks, Formatting.None,
+                      new JsonSerializerSettings // Shouldn't include a not set property
+                      {
+                          NullValueHandling = NullValueHandling.Ignore
+                      })));
 
             if (attachments != null && attachments.Length > 0)
-                   parameters.Add(new Tuple<string, string>("attachments",
-                       JsonConvert.SerializeObject(attachments, Formatting.None,
-                               new JsonSerializerSettings // Shouldn't include a not set property
-                               {
-                                   NullValueHandling = NullValueHandling.Ignore
-                               })));
+                parameters.Add(new Tuple<string, string>("attachments",
+                    JsonConvert.SerializeObject(attachments, Formatting.None,
+                            new JsonSerializerSettings // Shouldn't include a not set property
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            })));
 
             if (unfurl_links.HasValue)
                 parameters.Add(new Tuple<string, string>("unfurl_links", unfurl_links.Value ? "true" : "false"));
@@ -694,7 +695,7 @@ namespace SlackAPI
             if (!string.IsNullOrEmpty(thread_ts))
                 parameters.Add(new Tuple<string, string>("thread_ts", thread_ts));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void PostEphemeralMessage(
@@ -707,13 +708,13 @@ namespace SlackAPI
             Block[] blocks = null,
             Attachment[] attachments = null,
             bool as_user = false,
-	    string thread_ts = null)
+        string thread_ts = null)
         {
-            List<Tuple<string,string>> parameters = new List<Tuple<string,string>>();
+            List<Tuple<string, string>> parameters = new List<Tuple<string, string>>();
 
-            parameters.Add(new Tuple<string,string>("channel", channelId));
-            parameters.Add(new Tuple<string,string>("text", text));
-            parameters.Add(new Tuple<string,string>("user", targetuser));
+            parameters.Add(new Tuple<string, string>("channel", channelId));
+            parameters.Add(new Tuple<string, string>("text", text));
+            parameters.Add(new Tuple<string, string>("user", targetuser));
 
             if (!string.IsNullOrEmpty(parse))
                 parameters.Add(new Tuple<string, string>("parse", parse));
@@ -739,7 +740,7 @@ namespace SlackAPI
 
             parameters.Add(new Tuple<string, string>("as_user", as_user.ToString()));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
 
@@ -778,7 +779,7 @@ namespace SlackAPI
                 parameters.Add(new Tuple<string, string>("blocks",
                    JsonConvert.SerializeObject(blocks, Formatting.None,
                       new JsonSerializerSettings // Shouldn't include a not set property
-                     {
+                      {
                           NullValueHandling = NullValueHandling.Ignore
                       })));
 
@@ -786,7 +787,7 @@ namespace SlackAPI
                 parameters.Add(new Tuple<string, string>("attachments",
                     JsonConvert.SerializeObject(attachments, Formatting.None,
                             new JsonSerializerSettings // Shouldn't include a not set property
-                               {
+                            {
                                 NullValueHandling = NullValueHandling.Ignore
                             })));
 
@@ -805,7 +806,7 @@ namespace SlackAPI
             if (!string.IsNullOrEmpty(thread_ts))
                 parameters.Add(new Tuple<string, string>("thread_ts", thread_ts));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void DialogOpen(
@@ -813,18 +814,18 @@ namespace SlackAPI
            string triggerId,
            Dialog dialog)
         {
-           List<Tuple<string, string>> parameters = new List<Tuple<string, string>>();
+            List<Tuple<string, string>> parameters = new List<Tuple<string, string>>();
 
-           parameters.Add(new Tuple<string, string>("trigger_id", triggerId));
+            parameters.Add(new Tuple<string, string>("trigger_id", triggerId));
 
-           parameters.Add(new Tuple<string, string>("dialog",
-              JsonConvert.SerializeObject(dialog,
-                 new JsonSerializerSettings
-                 {
-                    NullValueHandling = NullValueHandling.Ignore
-                 })));
+            parameters.Add(new Tuple<string, string>("dialog",
+               JsonConvert.SerializeObject(dialog,
+                  new JsonSerializerSettings
+                  {
+                      NullValueHandling = NullValueHandling.Ignore
+                  })));
 
-           APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
         public void AddReaction(
@@ -844,41 +845,88 @@ namespace SlackAPI
             if (!string.IsNullOrEmpty(timestamp))
                 parameters.Add(new Tuple<string, string>("timestamp", timestamp));
 
-            APIRequestWithToken(callback, parameters.ToArray());
+            APIRequestWithToken(callback, [.. parameters]);
         }
 
-        public void UploadFile(Action<FileUploadResponse> callback, byte[] fileData, string fileName, string[] channelIds, string title = null, string initialComment = null, 
-            bool useAsync = false, string fileType = null, string thread_ts = null)
+        public void GetUploadURLExternal(Action<GetUploadUrlExternalResponse> callback, string fileName, byte[] fileData)
         {
-            Uri target = new Uri(Path.Combine(APIBaseLocation, useAsync ? "files.uploadAsync" : "files.upload"));
+            List<Tuple<string, string>> parameters =
+            [
+                new Tuple<string, string>("filename", fileName),
+                new Tuple<string, string>("length", fileData.Length.ToString()),
+            ];
+            APIRequestWithToken(callback, [.. parameters]);
+        }
 
-            List<string> parameters = new List<string>();
-
-            //File/Content
-            if (!string.IsNullOrEmpty(fileType))
-                parameters.Add(string.Format("{0}={1}", "filetype", fileType));
-
-            if (!string.IsNullOrEmpty(fileName))
-                parameters.Add(string.Format("{0}={1}", "filename", fileName));
-
-            if (!string.IsNullOrEmpty(title))
-                parameters.Add(string.Format("{0}={1}", "title", title));
-
-            if (!string.IsNullOrEmpty(initialComment))
-                parameters.Add(string.Format("{0}={1}", "initial_comment", initialComment));
-
-            if (!string.IsNullOrEmpty(thread_ts))
-                parameters.Add(string.Format("{0}={1}", "thread_ts", thread_ts));
-
-            parameters.Add(string.Format("{0}={1}", "channels", string.Join(",", channelIds)));
-
+        public void CompleteUploadExternal(Action<CompleteUploadExternalResponse> callback, string fileId, string title, string[] channelIds, string initialComment = null, string thread_ts = null)
+        {
+            Uri target = new(Path.Combine(APIBaseLocation, "files.completeUploadExternal"));
+            var files = new List<Dictionary<string, object>>{
+                new() {
+                    { "id", fileId },
+                    { "title", title }
+                }
+            };
             using (MultipartFormDataContent form = new MultipartFormDataContent())
             {
-                form.Add(new ByteArrayContent(fileData), "file", fileName);
-                HttpResponseMessage response = PostRequestAsync(string.Format("{0}?{1}", target, string.Join("&", parameters.ToArray())), form, APIToken).Result;
+                form.Add(new StringContent(JsonConvert.SerializeObject(files)), "files");
+                if (channelIds != null && channelIds.Length > 0)
+                    if (channelIds.Length == 1)
+                        form.Add(new StringContent(channelIds[0]), "channel_id");
+                    else
+                        form.Add(new StringContent(string.Join(",", channelIds)), "channels");
+                if (!string.IsNullOrEmpty(initialComment))
+                    form.Add(new StringContent(initialComment), "initial_comment");
+                if (!string.IsNullOrEmpty(thread_ts))
+                    form.Add(new StringContent(thread_ts), "thread_ts");
+                HttpResponseMessage response = PostRequestAsync(target.ToString(), form, APIToken).Result;
                 string result = response.Content.ReadAsStringAsync().Result;
-                callback(result.Deserialize<FileUploadResponse>());
+                callback(result.Deserialize<CompleteUploadExternalResponse>());
             }
+        }
+
+        public void UploadFile(Action<FileUploadResponse> callback, byte[] fileData, string fileName, string[] channelIds, string title = null, string initialComment = null, bool useAsync = false, string fileType = null, string thread_ts = null)
+        {
+            GetUploadURLExternal((uploadResponse =>
+            {
+                if (uploadResponse.ok)
+                {
+                    using (MultipartFormDataContent form = [])
+                    {
+                        form.Add(new ByteArrayContent(fileData), "file", fileName);
+                        HttpResponseMessage response = PostRequestAsync(uploadResponse.upload_url, form, APIToken).Result;
+                        string result = response.Content.ReadAsStringAsync().Result;
+                    }
+                    CompleteUploadExternal((completeResponse =>
+                    {
+                        if (completeResponse.ok)
+                        {
+                            GetFileInfo((fileInfoResponse =>
+                            {
+                                if (fileInfoResponse.ok)
+                                {
+                                    FileUploadResponse resp = new()
+                                    {
+                                        ok = true,
+                                        file = fileInfoResponse.file
+                                    };
+                                    callback(resp);
+                                }
+                            }), completeResponse.files[0].id);
+                        }
+                        else
+                        {
+                            Console.WriteLine("update error: " + completeResponse.error);
+                        }
+                    }), uploadResponse.file_id, title ?? fileName, channelIds, initialComment, thread_ts);
+                }
+                else
+                {
+                    Console.WriteLine("upload error: " + uploadResponse.error);
+                }
+            }), fileName, fileData);
+
+
         }
 
         public void DeleteFile(Action<FileDeleteResponse> callback, string file = null)
@@ -905,7 +953,7 @@ namespace SlackAPI
                     }))
             };
 
-            APIRequestWithToken(callback, parameters.ToArray());
-        }        
+            APIRequestWithToken(callback, [.. parameters]);
+        }
     }
 }

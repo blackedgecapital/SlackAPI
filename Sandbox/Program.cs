@@ -1,13 +1,17 @@
 ﻿using SlackAPI;
+using System;
 
-SlackSocketClient client = new SlackSocketClient("xoxb-15587958630-551525529541-mtBRI8KTYxYkiFyA3rWAWP3C");
+string SLACK_TOKEN = Environment.GetEnvironmentVariable("SLACK_TOKEN") ?? "";
+
+SlackSocketClient client = new SlackSocketClient(SLACK_TOKEN);
 client.Connect((response) => Console.WriteLine(response.ok));
 
-List<Channel> channels = new List<Channel>();
-
+// List<Channel> channels = new List<Channel>();
+// client.GetChannelList((response) => channels = response.channels.ToList());
+// Console.WriteLine(channels.Count);
 while (true)
 {
     string? input = Console.ReadLine();
-    client.GetChannelList((response) => channels = response.channels.ToList());
-    Console.WriteLine(channels.Count);
+    byte[] fileData = System.IO.File.ReadAllBytes("./tmp/gnome-child.png");
+    client.UploadFile((response) => Console.WriteLine(response.file.permalink), fileData, "gnome-child.png", ["C05FFHVD37Z"], "Gnome Child", "A gnome child image");
 }
