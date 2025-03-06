@@ -918,7 +918,7 @@ namespace SlackAPI
                         {
                             Console.WriteLine("update error: " + completeResponse.error);
                         }
-                    }), uploadResponse.file_id, title, channelIds, initialComment, thread_ts);
+                    }), uploadResponse.file_id, title ?? fileName, channelIds, initialComment, thread_ts);
                 }
                 else
                 {
