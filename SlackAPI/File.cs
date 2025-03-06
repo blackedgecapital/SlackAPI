@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SlackAPI
 {
@@ -67,7 +68,26 @@ namespace SlackAPI
         public string[] pinned_to;
 
         public Reaction[] reactions;
+
+        public Shares shares;
+
     }
+    public class Shares
+    {
+        public Dictionary<string, Dictionary<string, ShareInfo[]>> Public { get; set; }
+        public Dictionary<string, Dictionary<string, ShareInfo[]>> Private { get; set; }
+
+        public class ShareInfo
+        {
+            public string[] reply_users;
+            public int reply_users_count;
+            public int reply_count;
+            public string ts;
+            public string channel_name;
+            public string team_id;
+        }
+    }
+
 
     [Flags]
     public enum FileTypes

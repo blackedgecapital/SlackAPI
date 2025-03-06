@@ -885,7 +885,7 @@ namespace SlackAPI
             }
         }
 
-        public void UploadFile(Action<FileUploadResponse> callback, byte[] fileData, string fileName, string[] channelIds, string title, string initialComment = null, bool useAsync = false, string fileType = null, string thread_ts = null)
+        public void UploadFile(Action<FileUploadResponse> callback, byte[] fileData, string fileName, string[] channelIds, string title = null, string initialComment = null, bool useAsync = false, string fileType = null, string thread_ts = null)
         {
             GetUploadURLExternal((uploadResponse =>
             {
