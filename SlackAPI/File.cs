@@ -88,4 +88,22 @@ namespace SlackAPI
         public string user;
         public string comment;
     }
+
+    [RequestPath("files.getUploadURLExternal")]
+    public class GetUploadUrlExternalResponse : Response
+    {
+        public string upload_url;
+        public string file_id;
+    }
+    public class UploadFile
+    {
+        public string id;
+        public string title;
+    }
+
+    [RequestPath("files.completeUploadExternal")]
+    public class CompleteUploadExternalResponse : Response
+    {
+        public UploadFile[] files;
+    }
 }

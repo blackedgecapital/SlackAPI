@@ -84,6 +84,7 @@ namespace SlackAPI
             if (!string.IsNullOrEmpty(token))
                 request.Headers.Add("Authorization", "Bearer " + token);
 
+
             //This will handle all of the processing.
             RequestState<K> state = new RequestState<K>(request, postParameters, callback);
             state.Begin();
